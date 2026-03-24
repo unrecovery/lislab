@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISLAB · Sistema Integral de Laboratorio</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        /* --- VARIABLES: MODO CLARO --- */
+        :root {
+            --bg-app: #f4f7f9;
+            --bg-panel: #ffffff;
+            --bg-input: #f8fafc;
+            --border: #e2e8f0;
+            --accent: #0284c7;
+            --accent-hover: #0369a1;
+            --accent2: #059669;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --danger: #dc2626;
+            --warning: #ea580c;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-app);
+            color: var(--text-main);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        .logo,
+        th {
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* --- ICONOS SVG GLOBALES --- */
+        svg.icon {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* --- NAVEGACIÓN SUPERIOR --- */
+        .navbar {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            box-shadow: var(--shadow);
+            z-index: 10;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--text-main);
+        }
+
+        .nav-links {
+            display: flex;
+            height: 100%;
+        }
+
+        .nav-link {
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+            background: var(--bg-input);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: #f0f9ff;
+        }
+
+        /* --- BARRA DE HERRAMIENTAS --- */
+        .toolbar {
+            background: var(--bg-panel);
+            padding: 12px 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* --- BOTONES --- */
+        .btn {
+            background: var(--bg-panel);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn:hover {
+            background: var(--bg-input);
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-success {
+            background: var(--accent2);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: var(--danger);
+            border-color: #fca5a5;
+        }
+
+        .btn-danger:hover {
+            background: #fef2f2;
+            border-color: var(--danger);
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E;
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .module {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* --- TARJETAS Y FORMULARIOS --- */
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+
+        input[readonly] {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            font-weight: 600;
+        }
+
+        /* --- TABLAS --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-panel);
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-ready {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-canceled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            text-decoration: line-through;
+        }
+
+        .badge-type {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+
+        .badge-type.usg {
+            background: #fef08a;
+            color: #854d0e;
+            border-color: #fde047;
+        }
+
+        /* --- TOTALES CAJA --- */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .totals-box {
+            background: var(--bg-input);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            width: 320px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .total-row input {
+            width: 100px;
+            text-align: right;
+            padding: 4px 8px;
+            font-size: 13px;
+        }
+
+        .total-final {
+            font-size: 18px;
+            color: var(--accent2);
+            font-weight: 800;
+            border-top: 2px solid var(--border);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        /* --- ESTADÍSTICAS CAJA --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==========================================================================
+   ESTILOS DE IMPRESIÓN PROFESIONAL (A4 / CARTA)
+   ========================================================================== */
+        .print-container {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            #app-interface {
+                display: none !important;
+            }
+
+            .print-container {
+                display: none !important;
+            }
+
+            body.print-receipt #print-receipt,
+            body.print-label #print-label,
+            body.print-result #print-result,
+            body.print-cortez #print-cortez {
+                display: block !important;
+            }
+
+            /* --- 1. RECIBO DE PAGO & 4. CORTE DE CAJA Z (Mismo estilo base A4) --- */
+            #print-receipt,
+            #print-cortez {
+                width: 200mm;
+                margin: 0 auto;
+                font-family: 'DM Sans', Arial, sans-serif;
+                color: #000;
+                padding: 15mm;
+            }
+
+            .rec-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 3px solid #0284c7;
+                padding-bottom: 15px;
+                margin-bottom: 25px;
+            }
+
+            .rec-logo {
+                font-family: 'Syne', sans-serif;
+                font-size: 28px;
+                font-weight: 800;
+                color: #0284c7;
+                margin: 0;
+            }
+
+            .rec-logo span {
+                color: #0f172a;
+            }
+
+            .rec-company-info {
+                text-align: right;
+                font-size: 12px;
+                color: #333;
+                line-height: 1.4;
+            }
+
+            .rec-title-bar {
+                background: #f8fafc;
+                padding: 10px 15px;
+                border-left: 4px solid #0284c7;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .rec-title-bar.corte {
+                border-left-color: #dc2626;
+                background: #fef2f2;
+            }
+
+            .rec-title {
+                font-family: 'Syne', sans-serif;
+                font-size: 18px;
+                font-weight: 700;
+                margin: 0;
+                letter-spacing: 1px;
+            }
+
+            .rec-folio {
+                font-size: 16px;
+                font-weight: bold;
+                color: #dc2626;
+            }
+
+            .rec-patient-info {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 15px;
+                margin-bottom: 30px;
+                font-size: 12px;
+            }
+
+            .rec-box {
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                padding: 12px;
+            }
+
+            .rec-box strong {
+                color: #64748b;
+                font-size: 10px;
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            .rec-val {
+                font-size: 14px;
+                font-weight: 600;
+                color: #0f172a;
+                margin-bottom: 8px;
+            }
+
+            .rec-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                font-size: 12px;
+            }
+
+            .rec-table th {
+                background: #0284c7;
+                color: white;
+                padding: 10px;
+                text-align: left;
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 11px;
+            }
+
+            .rec-table.corte-table th {
+                background: #334155;
+            }
+
+            .rec-table td {
+                padding: 10px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .rec-table tr:nth-child(even) td {
+                background: #f8fafc;
+            }
+
+            .rec-totals {
+                width: 50%;
+                margin-left: auto;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                padding: 15px;
+                background: #f8fafc;
+            }
+
+            .rec-total-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                font-size: 13px;
+                color: #64748b;
+                font-weight: 600;
+            }
+
+            .rec-total-final {
+                display: flex;
+                justify-content: space-between;
+                border-top: 2px solid #cbd5e1;
+                padding-top: 10px;
+                margin-top: 5px;
+                font-size: 18px;
+                font-weight: 800;
+                color: #0284c7;
+            }
+
+            .rec-footer {
+                margin-top: 50px;
+                text-align: center;
+                font-size: 11px;
+                color: #64748b;
+                border-top: 1px solid #e2e8f0;
+                padding-top: 15px;
+            }
+
+            .signature-area {
+                display: flex;
+                justify-content: space-around;
+                margin-top: 60px;
+                text-align: center;
+                font-size: 12px;
+            }
+
+            .sig-line {
+                width: 220px;
+                border-top: 1px solid #000;
+                margin-bottom: 8px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* --- 2. FORMATO ETIQUETA ZEBRA (50mm x 25mm) --- */
+            #print-label {
+                width: 50mm;
+                height: 25mm;
+                overflow: hidden;
+                margin: 0;
+                padding: 2mm;
+                font-family: Arial, sans-serif;
+                color: #000;
+                background: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .lb-name {
+                font-size: 9px;
+                font-weight: bold;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .lb-info {
+                font-size: 8px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .lb-barcode {
+                height: 10mm;
+                background-image: repeating-linear-gradient(to right, #000, #000 2px, #fff 2px, #fff 4px, #000 4px, #000 5px, #fff 5px, #fff 8px);
+                width: 100%;
+            }
+
+            .lb-footer {
+                font-size: 7px;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            /* --- 3. FORMATO REPORTE RESULTADOS (Carta A4) --- */
+            #print-result {
+                width: 200mm;
+                margin: 0 auto;
+                font-family: Arial, sans-serif;
+                color: #000;
+                padding: 15mm;
+            }
+
+            .res-title {
+                text-align: center;
+                font-size: 16px;
+                font-weight: bold;
+                letter-spacing: 2px;
+                margin-bottom: 20px;
+            }
+
+            .res-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 11px;
+                margin-bottom: 30px;
+            }
+
+            .res-table th {
+                background: #f0f0f0;
+                padding: 8px;
+                text-align: left;
+                border-bottom: 2px solid #ccc;
+            }
+
+            .res-table td {
+                padding: 8px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .res-out-range {
+                font-weight: bold;
+                color: #d32f2f;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- INTERFAZ WEB -->
+    <div id="app-interface" style="display: flex; flex-direction: column; height: 100%;">
+
+        <nav class="navbar">
+            <div class="logo">
+                <svg class="icon" style="width:24px; height:24px;" viewBox="0 0 24 24">
+                    <path d="M10 2v7.31" />
+                    <path d="M14 9.3V1.99" />
+                    <path d="M8.5 2h7" />
+                    <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
+                    <path d="M5.52 16h12.96" />
+                </svg>
+                LIS<span>LAB</span>
+            </div>
+            <div class="nav-links">
+                <a class="nav-link active" onclick="switchTab('mod-recepcion', this)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg> Recepción
+                </a>
+                <a class="nav-link" onclick="switchTab('mod-historial', this)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 3v18h18" />
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+                    </svg> Historial
+                </a>
+                <a class="nav-link" onclick="switchTab('mod-resultados', this)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M10 2v7.31" />
+                        <path d="M14 9.3V1.99" />
+                        <path d="M8.5 2h7" />
+                        <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
+                        <path d="M5.52 16h12.96" />
+                    </svg> Resultados
+                </a>
+                <a class="nav-link" onclick="switchTab('mod-caja', this)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg> Caja y Cortes
+                </a>
+            </div>
+            <div
+                style="font-weight: 700; font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="reloj-nav">00:00</span>
+            </div>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- MÓDULO 1: RECEPCIÓN                        -->
+        <!-- ========================================== -->
+        <div id="mod-recepcion" class="module active main-content">
+
+            <div class="toolbar" style="margin: -20px -20px 20px -20px;">
+                <button class="btn" onclick="nuevoPacienteForm()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg> Limpiar Datos
+                </button>
+                <button class="btn btn-success" onclick="guardarYCobrar()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg> Guardar y Cobrar
+                </button>
+                <button class="btn btn-primary" onclick="imprimirReciboActual()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg> Imprimir Recibo Temp.
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Datos Generales</h2>
+                </div>
+                <div class="grid-form">
+                    <div class="form-group"><label>Folio</label><input type="text" id="folio" readonly></div>
+                    <div class="form-group"><label>Nombre(s)</label><input type="text" id="nombre"></div>
+                    <div class="form-group"><label>Ap. Paterno</label><input type="text" id="apPaterno"></div>
+                    <div class="form-group"><label>Ap. Materno</label><input type="text" id="apMaterno"></div>
+                    <div class="form-group"><label>Sexo</label><select id="sexo">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                        </select></div>
+                    <div class="form-group" style="flex-direction:row; align-items:flex-end; gap:10px;">
+                        <div style="display:flex; flex-direction:column; gap:5px; flex:1;">
+                            <label>Nacimiento</label><input type="date" id="fechaNac" onchange="calcularEdad()">
+                        </div>
+                        <input type="text" id="edadAnios" style="width:60px; text-align:center;" readonly title="Años">
+                    </div>
+                    <div class="form-group"><label>Médico Solicitante</label><input type="text" id="medico"
+                            value="A Quien Corresponda"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Estudios a Realizar</h2>
+                </div>
+
+                <div class="grid-form"
+                    style="margin-bottom: 20px; align-items: flex-end; background: var(--bg-app); padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Catálogo de Estudios</label>
+                        <select id="selectCatalogo" onchange="seleccionarDelCatalogo()">
+                            <option value="">-- Seleccionar estudio --</option>
+                            <option value="BH" data-precio="250" data-tipo="SANGRE">Biometría Hemática Completa</option>
+                            <option value="QS6" data-precio="450" data-tipo="SANGRE">Química Sanguínea 6 Elementos
+                            </option>
+                            <option value="EGO" data-precio="120" data-tipo="SANGRE">Examen General de Orina</option>
+                            <option value="USG_ABD" data-precio="800" data-tipo="USG">Ultrasonido Abdominal Completo
+                            </option>
+                            <option value="RX_TORAX" data-precio="350" data-tipo="RX">Radiografía de Tórax (PA)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Precio ($)</label><input type="number" id="precioEstudio"
+                            placeholder="0.00" readonly></div>
+                    <button class="btn btn-primary" style="padding: 10px 20px;" onclick="agregarEstudio()">Agregar a
+                        Lista</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaEstudios">
+                        <thead>
+                            <tr>
+                                <th style="width:10%;">Clave</th>
+                                <th style="width:15%;">Área</th>
+                                <th style="width:50%;">Estudio</th>
+                                <th class="text-right" style="width:15%;">Precio</th>
+                                <th style="text-align:center; width:10%;">Quitar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaEstudios"></tbody>
+                    </table>
+                </div>
+
+                <div class="totals-section">
+                    <div class="totals-box">
+                        <div class="total-row"><span>Subtotal:</span><span id="lblSubtotal">$0.00</span></div>
+                        <div class="total-row">
+                            <span>Descuento ($):</span>
+                            <input type="number" id="inputDescuento" value="0" min="0"
+                                oninput="renderizarEstudiosRecepcion()">
+                        </div>
+                        <div class="total-row total-final"><span>Total a Pagar:</span><span id="lblTotal">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÓDULO: HISTORIAL DE PACIENTES             -->
+        <!-- ========================================== -->
+        <div id="mod-historial" class="module main-content">
+            <div class="card">
+                <h2 class="card-title" style="margin-bottom: 15px;">Historial de Pacientes y Cobros</h2>
+                <p style="color:var(--text-muted); margin-bottom: 20px;">Lista de pacientes procesados. Si hubo un
+                    error, puede cancelar el folio, lo cual registrará una devolución automática en la caja.</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Fecha</th>
+                                <th>Paciente</th>
+                                <th>Importe</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaHistorial">
+                            <!-- Se llena desde localStorage -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÓDULO 2: RESULTADOS                       -->
+        <!-- ========================================== -->
+        <div id="mod-resultados" class="module main-content">
+
+            <!-- VISTA 1: TABLA DE PACIENTES -->
+            <div id="res-list-view">
+                <div class="card">
+                    <h2 class="card-title" style="margin-bottom: 15px;">Control de Resultados</h2>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Paciente</th>
+                                    <th>Estudio principal</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaResultadosGlobal">
+                                <!-- Se llena desde localStorage -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA 2: CAPTURA DE RESULTADOS -->
+            <div id="res-capture-view" style="display: none;">
+                <div class="toolbar" style="margin: -20px -20px 20px -20px;">
+                    <button class="btn" onclick="cerrarCaptura()">Volver a la Lista</button>
+                    <div style="flex-grow: 1;"></div>
+                    <button class="btn btn-success" onclick="guardarYLiberarResultado()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg> Guardar y Liberar
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Captura de Resultados: <span id="cap-paciente-nombre"
+                                style="color:var(--text-main);"></span></h2>
+                    </div>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">Estudio: <strong>Química Sanguínea
+                            Básica</strong></p>
+
+                    <div class="grid-form">
+                        <div class="form-group"><label>Glucosa en Ayuno (mg/dL) [70-100]</label><input type="number"
+                                id="res-glu"></div>
+                        <div class="form-group"><label>Urea Sérica (mg/dL) [17-43]</label><input type="number"
+                                id="res-ure"></div>
+                        <div class="form-group"><label>Creatinina Sérica (mg/dL) [0.7-1.3]</label><input type="number"
+                                id="res-cre"></div>
+                        <div class="form-group"><label>Ácido Úrico (mg/dL) [3.4-7.0]</label><input type="number"
+                                id="res-uri"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MÓDULO 4: CAJA Y CORTES                    -->
+        <!-- ========================================== -->
+        <div id="mod-caja" class="module main-content">
+            <div class="toolbar" style="margin: -20px -20px 20px -20px;">
+                <button class="btn" onclick="simularRetiro()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg> Registrar Gasto / Retiro
+                </button>
+                <div style="flex-grow: 1;"></div>
+                <button class="btn btn-danger" style="font-weight: bold;" onclick="cerrarCaja()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg> Generar Corte Z
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" style="border-left-color: var(--accent2);">
+                    <div class="stat-label">Ingresos del Día</div>
+                    <div class="stat-value" id="cajaIngresos">$ 0.00</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--danger);">
+                    <div class="stat-label">Retiros / Devoluciones</div>
+                    <div class="stat-value" id="cajaRetiros">$ 0.00</div>
+                </div>
+                <div class="stat-card" style="border-left-color: var(--accent);">
+                    <div class="stat-label">Saldo Neto en Caja</div>
+                    <div class="stat-value" id="cajaTotal">$ 0.00</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title" style="margin-bottom: 15px;">Desglose de Movimientos</h2>
+                <div class="table-responsive">
+                    <table id="tablaMovimientos">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Concepto</th>
+                                <th>Referencia</th>
+                                <th class="text-right">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaMovimientos">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Fin Interfaz Web -->
+
+    <!-- ========================================================================= -->
+    <!-- CONTENEDORES PARA IMPRESIÓN (OCULTOS EN WEB, VISIBLES EN PDF)           -->
+    <!-- ========================================================================= -->
+
+    <!-- 1. NUEVO RECIBO DE PAGO PROFESIONAL (Media Carta/A4) -->
+    <div id="print-receipt" class="print-container">
+        <div class="rec-header">
+            <div>
+                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Laboratorio de Análisis Clínicos
+                    Especializados</div>
+            </div>
+            <div class="rec-company-info">
+                <strong>LISLAB S.A. DE C.V.</strong><br>
+                Av. Principal 123, Colonia Centro.<br>
+                RFC: LISL260323XYZ<br>
+                Tel: (555) 123-4567 | www.lislab.mx
+            </div>
+        </div>
+
+        <div class="rec-title-bar">
+            <h2 class="rec-title">COMPROBANTE DE PAGO</h2>
+            <div class="rec-folio">FOLIO: <span id="prc-folio">---</span></div>
+        </div>
+
+        <div class="rec-patient-info">
+            <div class="rec-box">
+                <strong>Paciente</strong>
+                <div class="rec-val" id="prc-paciente">---</div>
+                <strong>Médico Solicitante</strong>
+                <div class="rec-val" id="prc-medico">---</div>
+            </div>
+            <div class="rec-box">
+                <strong>Fecha de Emisión</strong>
+                <div class="rec-val" id="prc-fecha">---</div>
+                <strong>Edad / Sexo</strong>
+                <div class="rec-val"><span id="prc-edad">---</span> / <span id="prc-sexo">---</span></div>
+            </div>
+        </div>
+
+        <table class="rec-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">CLAVE</th>
+                    <th style="width: 65%;">DESCRIPCIÓN DEL ESTUDIO</th>
+                    <th style="width: 20%; text-align: right;">IMPORTE</th>
+                </tr>
+            </thead>
+            <tbody id="prc-lista">
+                <!-- llenado dinámico -->
+            </tbody>
+        </table>
+
+        <div class="rec-totals">
+            <div class="rec-total-row"><span>Subtotal:</span><span id="prc-subtotal">$0.00</span></div>
+            <div class="rec-total-row"><span>Descuento:</span><span id="prc-descuento">-$0.00</span></div>
+            <div class="rec-total-final"><span>TOTAL PAGADO:</span><span id="prc-total">$0.00</span></div>
+        </div>
+
+        <div class="rec-footer">
+            Los resultados estarán disponibles según los tiempos de proceso de cada estudio.<br>
+            Consulte sus resultados en línea ingresando a www.lislab.mx con su Folio.<br>
+            *** ESTE DOCUMENTO ES UN COMPROBANTE DE PAGO, NO ES UN RESULTADO MÉDICO ***
+        </div>
+    </div>
+
+    <!-- 2. ETIQUETA DE TUBO ZEBRA -->
+    <div id="print-label" class="print-container">
+        <div class="lb-name" id="pl-nombre">--</div>
+        <div class="lb-info"><span id="pl-edad">--</span><span id="pl-fecha">--</span></div>
+        <div class="lb-barcode"></div>
+        <div class="lb-footer"><span id="pl-folio">--</span> - MUESTRA</div>
+    </div>
+
+    <!-- 3. REPORTE RESULTADOS MÉDICOS -->
+    <div id="print-result" class="print-container">
+        <div class="rec-header">
+            <div>
+                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <p style="font-size:12px; margin-top:5px; color:#555;">Laboratorio de Análisis Clínicos Especializados
+                </p>
+            </div>
+            <div class="rec-company-info">
+                <strong>Fecha Emisión:</strong> <span class="current-date"></span><br>
+                <strong>Folio:</strong> <span id="pr-folio">--</span>
+            </div>
+        </div>
+
+        <div class="rec-patient-info" style="margin-bottom: 20px;">
+            <div class="rec-box" style="background: #f8fafc;">
+                <strong>Paciente:</strong> <span id="pr-nombre"
+                    style="font-size:14px; font-weight:bold;">--</span><br><br>
+                <strong>Médico:</strong> <span id="pr-medico">--</span>
+            </div>
+            <div class="rec-box">
+                <strong>Edad / Sexo:</strong> <span id="pr-edadsexo">--</span><br><br>
+                <strong>Fecha Muestra:</strong> <span id="pr-fechamuestra">--</span>
+            </div>
+        </div>
+
+        <div class="res-title">REPORTE DE RESULTADOS CLÍNICOS</div>
+
+        <div
+            style="background:#0284c7; color:#fff; padding:6px 10px; font-weight:bold; font-size:12px; margin-bottom:10px;">
+            QUÍMICA SANGUÍNEA
+        </div>
+
+        <table class="res-table">
+            <thead>
+                <tr>
+                    <th>PRUEBA</th>
+                    <th>RESULTADO</th>
+                    <th>UNIDADES</th>
+                    <th>VALORES DE REFERENCIA</th>
+                </tr>
+            </thead>
+            <tbody id="pr-resultados-tabla">
+                <!-- Llenado dinámico -->
+            </tbody>
+        </table>
+        <div style="font-size:10px; color:#555;">(*) Valores fuera de rango de referencia.</div>
+
+        <div class="signature-area">
+            <div>
+                <div class="sig-line"></div><strong>Q.F.B. Titular</strong><br>Céd. Prof. 1234567
+            </div>
+            <div>
+                <div class="sig-line"></div><strong>Dr. Director Médico</strong><br>Céd. Prof. 7654321
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CORTE Z (REDISEÑADO A TAMAÑO CARTA DETALLADO) -->
+    <div id="print-cortez" class="print-container">
+        <div class="rec-header">
+            <div>
+                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Sistema de Administración de Caja</div>
+            </div>
+            <div class="rec-company-info">
+                <strong>REPORTE DE TURNO</strong><br>
+                Impreso: <span class="current-date"></span> <span id="pz-hora-impresion"></span><br>
+                Cajero: Recepción General
+            </div>
+        </div>
+
+        <div class="rec-title-bar corte">
+            <h2 class="rec-title" style="color:#dc2626;">CORTE DE CAJA (Z)</h2>
+            <div class="rec-folio">CIERRE DIARIO</div>
+        </div>
+
+        <div class="rec-patient-info" style="grid-template-columns: 1fr 1fr 1fr;">
+            <div class="rec-box" style="text-align:center;">
+                <strong>Fondo Inicial</strong>
+                <div class="rec-val">$0.00</div>
+            </div>
+            <div class="rec-box" style="text-align:center;">
+                <strong>Total Movimientos</strong>
+                <div class="rec-val" id="pz-cant-mov">0</div>
+            </div>
+            <div class="rec-box" style="text-align:center;">
+                <strong>Estatus</strong>
+                <div class="rec-val" style="color:var(--accent2);">CERRADO</div>
+            </div>
+        </div>
+
+        <h3 style="font-family:'Syne',sans-serif; margin-bottom:10px; font-size:14px;">DESGLOSE DE MOVIMIENTOS</h3>
+        <table class="rec-table corte-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">HORA</th>
+                    <th style="width: 45%;">CONCEPTO</th>
+                    <th style="width: 20%;">REFERENCIA</th>
+                    <th style="width: 20%; text-align: right;">MONTO</th>
+                </tr>
+            </thead>
+            <tbody id="pz-lista-completa">
+                <!-- llenado dinámico de todos los movimientos -->
+            </tbody>
+        </table>
+
+        <div class="rec-totals" style="width: 45%; margin-top: 30px;">
+            <div class="rec-total-row"><span>Total Ingresos (+):</span><span id="pz-ingresos"
+                    style="color:var(--accent2);">$0.00</span></div>
+            <div class="rec-total-row"><span>Total Egresos/Dev. (-):</span><span id="pz-retiros"
+                    style="color:var(--danger);">$0.00</span></div>
+            <div class="rec-total-final"><span>SALDO NETO ENTREGAR:</span><span id="pz-total">$0.00</span></div>
+        </div>
+
+        <div class="signature-area">
+            <div>
+                <div class="sig-line"></div><strong>Firma del Cajero</strong><br>Entrega
+            </div>
+            <div>
+                <div class="sig-line"></div><strong>Firma Supervisor / Contabilidad</strong><br>Recibe
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // ALMACENAMIENTO LOCAL (Base de Datos Simulada)
+        // ==========================================
+        let DB = {
+            pacientes: [],
+            movimientos: [],
+            caja: { ingresos: 0, retiros: 0, total: 0 },
+            folioActual: 10026
+        };
+
+        // Variables temporales en memoria para la recepción
+        let estudiosActuales = [];
+        let idCapturaActiva = null;
+
+        window.onload = () => {
+            cargarBD();
+            document.getElementById('folio').value = DB.folioActual;
+            document.querySelectorAll('.current-date').forEach(el => el.innerText = new Date().toLocaleDateString('es-MX'));
+
+            // Renderizar vistas con datos de BD
+            renderizarHistorial();
+            renderizarListaResultados();
+            actualizarCajaVisual();
+            renderizarMovimientos();
+        };
+
+        function cargarBD() {
+            const data = localStorage.getItem('lislab_db_v2'); // Cambié la key para iniciar limpio con la nueva estructura
+            if (data) { DB = JSON.parse(data); }
+        }
+
+        function guardarBD() {
+            localStorage.setItem('lislab_db_v2', JSON.stringify(DB));
+        }
+
+        // ==========================================
+        // NAVEGACIÓN
+        // ==========================================
+        function switchTab(modId, tabElement) {
+            document.querySelectorAll('.module').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(modId).classList.add('active');
+            tabElement.classList.add('active');
+        }
+
+        setInterval(() => { document.getElementById('reloj-nav').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }); }, 1000);
+
+        // ==========================================
+        // MÓDULO 1: RECEPCIÓN Y DESCUENTOS
+        // ==========================================
+        function calcularEdad() {
+            const fechaNac = document.getElementById('fechaNac').value;
+            if (!fechaNac) return;
+            const nacimiento = new Date(fechaNac);
+            const hoy = new Date();
+            let anios = hoy.getFullYear() - nacimiento.getFullYear();
+            if (hoy.getMonth() < nacimiento.getMonth() || (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate())) { anios--; }
+            document.getElementById('edadAnios').value = anios;
+        }
+
+        function seleccionarDelCatalogo() {
+            const select = document.getElementById('selectCatalogo');
+            const option = select.options[select.selectedIndex];
+            if (option.value) { document.getElementById('precioEstudio').value = option.dataset.precio; }
+            else { document.getElementById('precioEstudio').value = ""; }
+        }
+
+        function agregarEstudio() {
+            const select = document.getElementById('selectCatalogo');
+            if (!select.value) return;
+            const option = select.options[select.selectedIndex];
+            estudiosActuales.push({ clave: select.value, tipo: option.dataset.tipo, nombre: option.text, precio: parseFloat(option.dataset.precio) });
+            select.value = ""; document.getElementById('precioEstudio').value = "";
+            renderizarEstudiosRecepcion();
+        }
+
+        function eliminarEstudio(index) { estudiosActuales.splice(index, 1); renderizarEstudiosRecepcion(); }
+
+        function renderizarEstudiosRecepcion() {
+            const tbody = document.getElementById('listaEstudios');
+            tbody.innerHTML = '';
+            let subtotal = 0;
+
+            if (estudiosActuales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Seleccione estudios para comenzar</td></tr>';
+            } else {
+                estudiosActuales.forEach((est, index) => {
+                    subtotal += est.precio;
+                    const badgeClass = est.tipo === 'USG' || est.tipo === 'RX' ? 'badge-type usg' : 'badge-type';
+                    tbody.innerHTML += `
+        <tr>
+          <td style="color: var(--text-muted); font-size: 11px; font-weight:bold;">${est.clave}</td>
+          <td><span class="badge ${badgeClass}">${est.tipo}</span></td>
+          <td style="font-weight: 600;">${est.nombre}</td>
+          <td class="text-right">$${est.precio.toFixed(2)}</td>
+          <td style="text-align:center;"><button onclick="eliminarEstudio(${index})" class="btn btn-danger" style="padding: 4px 8px;" title="Quitar">X</button></td>
+        </tr>
+      `;
+                });
+            }
+
+            const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;
+            const total = subtotal - descuento;
+
+            document.getElementById('lblSubtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('lblTotal').innerText = `$${Math.max(0, total).toFixed(2)}`;
+        }
+
+        function nuevoPacienteForm() {
+            document.getElementById('nombre').value = '';
+            document.getElementById('apPaterno').value = '';
+            document.getElementById('apMaterno').value = '';
+            document.getElementById('edadAnios').value = '';
+            document.getElementById('fechaNac').value = '';
+            document.getElementById('inputDescuento').value = '0';
+            estudiosActuales = [];
+            renderizarEstudiosRecepcion();
+        }
+
+        function guardarYCobrar() {
+            if (estudiosActuales.length === 0) { alert("Agregue al menos un estudio."); return; }
+
+            const nombre = document.getElementById('nombre').value;
+            const apPaterno = document.getElementById('apPaterno').value;
+            const nombreCompleto = `${nombre} ${apPaterno} ${document.getElementById('apMaterno').value}`.trim() || 'Público en General';
+
+            if (!nombre || !apPaterno) { alert("Ingrese al menos Nombre y Apellido Paterno."); return; }
+
+            const subtotal = estudiosActuales.reduce((acc, curr) => acc + curr.precio, 0);
+            const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;
+            const totalCobro = Math.max(0, subtotal - descuento);
+
+            const fechaActualStr = new Date().toLocaleDateString('es-MX') + " " + new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+
+            // 1. Crear Objeto Paciente
+            const nuevoPaciente = {
+                folio: DB.folioActual,
+                fecha: fechaActualStr,
+                nombre: nombreCompleto,
+                edad: document.getElementById('edadAnios').value || '0',
+                sexo: document.getElementById('sexo').value,
+                medico: document.getElementById('medico').value || 'A Quien Corresponda',
+                estudios: [...estudiosActuales],
+                subtotal: subtotal,
+                descuento: descuento,
+                total: totalCobro,
+                estado: 'Pendiente',
+                resultadosGuardados: null
+            };
+
+            DB.pacientes.unshift(nuevoPaciente); // Agregar al inicio
+
+            // 2. Registrar en Caja
+            DB.caja.ingresos += totalCobro;
+            DB.movimientos.unshift({
+                hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                concepto: 'Cobro Estudios',
+                ref: DB.folioActual,
+                monto: totalCobro,
+                tipo: 'ingreso'
+            });
+
+            // 3. Aumentar folio y guardar BD
+            DB.folioActual++;
+            guardarBD();
+
+            // Actualizar Vistas
+            document.getElementById('folio').value = DB.folioActual;
+            renderizarHistorial();
+            renderizarListaResultados();
+            actualizarCajaVisual();
+            renderizarMovimientos();
+
+            // Imprimir recibo automáticamente
+            ejecutarImpresionRecibo(nuevoPaciente);
+            nuevoPacienteForm();
+        }
+
+        function imprimirReciboActual() {
+            if (estudiosActuales.length === 0) {
+                alert("No hay estudios cargados para imprimir. Guárdalo primero o imprímelo desde el Historial.");
+                return;
+            }
+            const subtotal = estudiosActuales.reduce((acc, curr) => acc + curr.precio, 0);
+            const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;
+
+            const tempPx = {
+                folio: "TEMP",
+                fecha: new Date().toLocaleDateString('es-MX'),
+                nombre: `${document.getElementById('nombre').value} ${document.getElementById('apPaterno').value}`.trim() || 'Paciente No Guardado',
+                edad: document.getElementById('edadAnios').value || '0',
+                sexo: document.getElementById('sexo').value,
+                medico: document.getElementById('medico').value,
+                estudios: estudiosActuales,
+                subtotal: subtotal,
+                descuento: descuento,
+                total: Math.max(0, subtotal - descuento)
+            };
+            ejecutarImpresionRecibo(tempPx);
+        }
+
+        // ==========================================
+        // MÓDULO: HISTORIAL (CANCELACIONES)
+        // ==========================================
+        function renderizarHistorial() {
+            const tbody = document.getElementById('listaHistorial');
+            tbody.innerHTML = '';
+
+            if (DB.pacientes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">No hay pacientes registrados aún.</td></tr>';
+                return;
+            }
+
+            DB.pacientes.forEach((px) => {
+                const isCanceled = px.estado === 'Cancelado';
+                const statusBadge = isCanceled ? '<span class="badge badge-canceled">Cancelado</span>' : '<span class="badge badge-ready">Activo</span>';
+
+                // Si está cancelado, ocultar botones de acción y tachar monto
+                const montoDisplay = isCanceled ? `<span style="text-decoration:line-through; color:var(--muted);">$${px.total.toFixed(2)}</span>` : `$${px.total.toFixed(2)}`;
+
+                let botones = '';
+                if (!isCanceled) {
+                    botones = `
+        <button class="btn btn-primary" style="padding:4px 8px; font-size:11px;" onclick="imprimirReciboDesdeHistorial(${px.folio})">Recibo</button>
+        <button class="btn" style="padding:4px 8px; font-size:11px;" onclick="imprimirEtiquetaDesdeHistorial(${px.folio})">Etiqueta</button>
+        <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="cancelarFolio(${px.folio})">Cancelar</button>
+      `;
+                }
+
+                tbody.innerHTML += `
+      <tr style="${isCanceled ? 'background-color: #f8fafc; opacity:0.8;' : ''}">
+        <td style="font-weight:bold; color:var(--accent);">${px.folio}</td>
+        <td>${px.fecha}</td>
+        <td style="font-weight:600;">${px.nombre}</td>
+        <td>${montoDisplay}</td>
+        <td>${statusBadge}</td>
+        <td>${botones}</td>
+      </tr>
+    `;
+            });
+        }
+
+        function cancelarFolio(folio) {
+            const px = obtenerPaciente(folio);
+            if (!px) return;
+
+            if (confirm(`¿Está seguro de CANCELAR el Folio ${folio} a nombre de ${px.nombre}?\n\nEsto registrará una devolución por $${px.total.toFixed(2)} en la caja y eliminará sus pendientes.`)) {
+                // 1. Cambiar estado
+                px.estado = 'Cancelado';
+
+                // 2. Registrar devolución (Egreso) en Caja
+                DB.caja.retiros += px.total;
+                DB.movimientos.unshift({
+                    hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                    concepto: 'Devolución (Cancelación)',
+                    ref: `DEV-${px.folio}`,
+                    monto: px.total,
+                    tipo: 'retiro'
+                });
+
+                guardarBD();
+
+                // 3. Actualizar vistas
+                renderizarHistorial();
+                renderizarListaResultados();
+                actualizarCajaVisual();
+                renderizarMovimientos();
+
+                alert(`Folio ${folio} cancelado exitosamente.`);
+            }
+        }
+
+        function obtenerPaciente(folio) {
+            return DB.pacientes.find(p => p.folio === folio);
+        }
+
+        // ==========================================
+        // MÓDULO 2: RESULTADOS
+        // ==========================================
+        function renderizarListaResultados() {
+            const tbody = document.getElementById('listaResultadosGlobal');
+            tbody.innerHTML = '';
+
+            // Filtrar pacientes cancelados de la lista de resultados
+            const pxActivos = DB.pacientes.filter(p => p.estado !== 'Cancelado');
+
+            if (pxActivos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">Sin estudios pendientes.</td></tr>';
+                return;
+            }
+
+            pxActivos.forEach(px => {
+                const estudioPrincipal = px.estudios[0] ? px.estudios[0].nombre : 'Varios';
+                const esLiberado = px.estado === 'Liberado';
+                const badge = esLiberado ? '<span class="badge badge-ready">Liberado</span>' : '<span class="badge badge-pending">Pendiente</span>';
+
+                let botones = '';
+                if (!esLiberado) {
+                    botones = `<button class="btn" style="padding:4px 8px;" onclick="abrirCaptura(${px.folio})">Capturar</button>`;
+                } else {
+                    botones = `
+        <button class="btn btn-primary" style="padding:4px 8px;" onclick="imprimirResultado(${px.folio})">Ver PDF</button>
+        <button class="btn btn-whatsapp" style="padding:4px 8px;" onclick="enviarWA('${px.nombre}')">WA</button>
+      `;
+                }
+
+                tbody.innerHTML += `
+      <tr>
+        <td>${px.folio}</td>
+        <td style="font-weight:600;">${px.nombre}</td>
+        <td style="font-size:12px;">${estudioPrincipal}</td>
+        <td>${badge}</td>
+        <td>${botones}</td>
+      </tr>
+    `;
+            });
+        }
+
+        function abrirCaptura(folio) {
+            const px = obtenerPaciente(folio);
+            if (!px) return;
+            idCapturaActiva = folio;
+
+            document.getElementById('cap-paciente-nombre').innerText = px.nombre;
+            document.getElementById('res-glu').value = '';
+            document.getElementById('res-ure').value = '';
+            document.getElementById('res-cre').value = '';
+            document.getElementById('res-uri').value = '';
+
+            document.getElementById('res-list-view').style.display = 'none';
+            document.getElementById('res-capture-view').style.display = 'block';
+        }
+
+        function cerrarCaptura() {
+            document.getElementById('res-capture-view').style.display = 'none';
+            document.getElementById('res-list-view').style.display = 'block';
+            idCapturaActiva = null;
+        }
+
+        function guardarYLiberarResultado() {
+            if (!idCapturaActiva) return;
+            const px = obtenerPaciente(idCapturaActiva);
+
+            px.estado = 'Liberado';
+            px.resultadosGuardados = {
+                glucosa: document.getElementById('res-glu').value,
+                urea: document.getElementById('res-ure').value,
+                creatinina: document.getElementById('res-cre').value,
+                urico: document.getElementById('res-uri').value
+            };
+            guardarBD();
+
+            cerrarCaptura();
+            renderizarListaResultados();
+        }
+
+        function enviarWA(nombrePx) {
+            const mensaje = encodeURIComponent(`Hola ${nombrePx}, sus resultados de LISLAB ya están disponibles. Puede solicitarlos por este medio o recogerlos en sucursal.`);
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
+        }
+
+
+        // ==========================================
+        // MÓDULO 4: CAJA Y CORTES
+        // ==========================================
+        function simularRetiro() {
+            const montoStr = prompt("Ingrese el monto del Retiro / Gasto (Ej. Compra de jeringas):");
+            if (!montoStr) return;
+            const monto = parseFloat(montoStr);
+            if (isNaN(monto) || monto <= 0) return;
+
+            DB.caja.retiros += monto;
+            DB.movimientos.unshift({
+                hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                concepto: 'Gasto Administrativo',
+                ref: `G-${Math.floor(Math.random() * 1000)}`,
+                monto: monto,
+                tipo: 'retiro'
+            });
+
+            guardarBD();
+            actualizarCajaVisual();
+            renderizarMovimientos();
+        }
+
+        function actualizarCajaVisual() {
+            DB.caja.total = DB.caja.ingresos - DB.caja.retiros;
+            document.getElementById('cajaIngresos').innerText = `$ ${DB.caja.ingresos.toFixed(2)}`;
+            document.getElementById('cajaRetiros').innerText = `$ ${DB.caja.retiros.toFixed(2)}`;
+            document.getElementById('cajaTotal').innerText = `$ ${DB.caja.total.toFixed(2)}`;
+        }
+
+        function renderizarMovimientos() {
+            const tbody = document.getElementById('listaMovimientos');
+            tbody.innerHTML = '';
+            if (DB.movimientos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin movimientos registrados en este turno.</td></tr>';
+                return;
+            }
+
+            DB.movimientos.forEach(m => {
+                const color = m.tipo === 'ingreso' ? 'var(--accent2)' : 'var(--danger)';
+                const signo = m.tipo === 'ingreso' ? '+' : '-';
+                tbody.innerHTML += `
+      <tr>
+        <td>${m.hora}</td>
+        <td>${m.concepto}</td>
+        <td>${m.ref}</td>
+        <td class="text-right" style="color:${color}; font-weight:bold;">${signo}$${m.monto.toFixed(2)}</td>
+      </tr>
+    `;
+            });
+        }
+
+        function cerrarCaja() {
+            if (DB.caja.ingresos === 0 && DB.caja.retiros === 0) { alert("La caja ya está en ceros."); return; }
+
+            if (confirm("¿Está seguro de generar el Reporte de Corte Z?\n\nEsto emitirá el reporte A4 en PDF y reseteará el turno actual a $0.00.")) {
+
+                // Preparar impresión de Corte
+                document.getElementById('pz-hora-impresion').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('pz-cant-mov').innerText = DB.movimientos.length;
+
+                const tbodyPZ = document.getElementById('pz-lista-completa');
+                tbodyPZ.innerHTML = '';
+
+                // Llenar tabla del corte Z (del último al primero para orden cronológico si se desea, aquí lo dejamos como está)
+                [...DB.movimientos].reverse().forEach(m => {
+                    const color = m.tipo === 'ingreso' ? '#0f172a' : '#dc2626';
+                    const signo = m.tipo === 'ingreso' ? '' : '-';
+                    tbodyPZ.innerHTML += `
+        <tr>
+          <td>${m.hora}</td>
+          <td>${m.concepto}</td>
+          <td>${m.ref}</td>
+          <td style="text-align: right; color:${color};">${signo}$${m.monto.toFixed(2)}</td>
+        </tr>
+      `;
+                });
+
+                document.getElementById('pz-ingresos').innerText = `$${DB.caja.ingresos.toFixed(2)}`;
+                document.getElementById('pz-retiros').innerText = `$${DB.caja.retiros.toFixed(2)}`;
+                document.getElementById('pz-total').innerText = `$${DB.caja.total.toFixed(2)}`;
+
+                document.body.className = 'print-cortez';
+                window.print();
+
+                // Limpiar Caja en BD
+                DB.caja = { ingresos: 0, retiros: 0, total: 0 };
+                DB.movimientos = [];
+                guardarBD();
+
+                actualizarCajaVisual();
+                renderizarMovimientos();
+            }
+        }
+
+        // ==========================================
+        // FUNCIONES DE IMPRESIÓN DINÁMICA
+        // ==========================================
+        function imprimirReciboDesdeHistorial(folio) {
+            const px = obtenerPaciente(folio);
+            if (px) ejecutarImpresionRecibo(px);
+        }
+
+        function ejecutarImpresionRecibo(px) {
+            document.body.className = '';
+
+            document.getElementById('prc-folio').innerText = px.folio;
+            document.getElementById('prc-fecha').innerText = px.fecha;
+            document.getElementById('prc-paciente').innerText = px.nombre;
+            document.getElementById('prc-medico').innerText = px.medico;
+            document.getElementById('prc-edad').innerText = px.edad + " Años";
+            document.getElementById('prc-sexo').innerText = px.sexo;
+
+            const tbody = document.getElementById('prc-lista');
+            tbody.innerHTML = '';
+            px.estudios.forEach(est => {
+                tbody.innerHTML += `<tr><td>${est.clave}</td><td>${est.nombre}</td><td style="text-align: right;">$${est.precio.toFixed(2)}</td></tr>`;
+            });
+
+            // Soporte para facturas sin descuento registrado en versiones anteriores
+            const sub = px.subtotal || px.total;
+            const desc = px.descuento || 0;
+
+            document.getElementById('prc-subtotal').innerText = `$${sub.toFixed(2)}`;
+            document.getElementById('prc-descuento').innerText = `-$${desc.toFixed(2)}`;
+            document.getElementById('prc-total').innerText = `$${px.total.toFixed(2)}`;
+
+            document.body.classList.add('print-receipt');
+            window.print();
+        }
+
+        function imprimirEtiquetaDesdeHistorial(folio) {
+            const px = obtenerPaciente(folio);
+            if (!px) return;
+            document.body.className = '';
+            document.getElementById('pl-nombre').innerText = px.nombre.toUpperCase();
+            document.getElementById('pl-edad').innerText = `${px.edad}A-${px.sexo.substring(0, 1)}`;
+            document.getElementById('pl-fecha').innerText = new Date().toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: '2-digit' });
+            document.getElementById('pl-folio').innerText = px.folio;
+            document.body.classList.add('print-label');
+            window.print();
+        }
+
+        function imprimirResultado(folio) {
+            const px = obtenerPaciente(folio);
+            if (!px || !px.resultadosGuardados) return;
+
+            document.body.className = '';
+            document.getElementById('pr-folio').innerText = px.folio;
+            document.getElementById('pr-nombre').innerText = px.nombre;
+            document.getElementById('pr-medico').innerText = px.medico;
+            document.getElementById('pr-edadsexo').innerText = `${px.edad} Años / ${px.sexo}`;
+            document.getElementById('pr-fechamuestra').innerText = px.fecha;
+
+            const res = px.resultadosGuardados;
+            const valGlu = parseFloat(res.glucosa) > 100 || parseFloat(res.glucosa) < 70 ? `${res.glucosa} *` : res.glucosa;
+            const clsGlu = parseFloat(res.glucosa) > 100 || parseFloat(res.glucosa) < 70 ? 'res-out-range' : '';
+            const valUre = parseFloat(res.urea) > 43 || parseFloat(res.urea) < 17 ? `${res.urea} *` : res.urea;
+            const clsUre = parseFloat(res.urea) > 43 || parseFloat(res.urea) < 17 ? 'res-out-range' : '';
+
+            const tbody = document.getElementById('pr-resultados-tabla');
+            tbody.innerHTML = `
+    <tr><td>Glucosa en Ayuno</td><td class="${clsGlu}">${valGlu || '-'}</td><td>mg/dL</td><td>70.0 - 100.0</td></tr>
+    <tr><td>Urea Sérica</td><td class="${clsUre}">${valUre || '-'}</td><td>mg/dL</td><td>17.0 - 43.0</td></tr>
+    <tr><td>Creatinina Sérica</td><td>${res.creatinina || '-'}</td><td>mg/dL</td><td>0.70 - 1.30</td></tr>
+    <tr><td>Ácido Úrico</td><td>${res.urico || '-'}</td><td>mg/dL</td><td>3.4 - 7.0</td></tr>
+  `;
+
+            document.body.classList.add('print-result');
+            window.print();
+        }
+    </script>
+
+</body>
+
+</html>

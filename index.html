@@ -45,7 +45,6 @@
         h1,
         h2,
         h3,
-        .logo,
         th {
             font-family: 'Syne', sans-serif;
         }
@@ -61,6 +60,72 @@
             stroke-linejoin: round;
         }
 
+        /* --- IMÁGENES LOGO --- */
+        .nav-logo-img {
+            max-height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .print-logo-img {
+            max-height: 50px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+
+        /* --- LOGIN INTERFACE --- */
+        #login-interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-app);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            background-image: radial-gradient(circle at center, #e0f2fe 0%, var(--bg-app) 100%);
+        }
+
+        .login-card {
+            background: var(--bg-panel);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        /* --- MODAL DEL SISTEMA --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(3px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: var(--bg-panel);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
         /* --- NAVEGACIÓN SUPERIOR --- */
         .navbar {
             background: var(--bg-panel);
@@ -72,19 +137,6 @@
             height: 60px;
             box-shadow: var(--shadow);
             z-index: 10;
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 22px;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo span {
-            color: var(--text-main);
         }
 
         .nav-links {
@@ -253,6 +305,7 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            text-align: left;
         }
 
         label {
@@ -272,6 +325,7 @@
             font-family: inherit;
             font-size: 14px;
             transition: border 0.2s;
+            width: 100%;
         }
 
         input:focus,
@@ -456,7 +510,9 @@
                 margin: 0 !important;
             }
 
-            #app-interface {
+            #app-interface,
+            #login-interface,
+            #modal-overlay {
                 display: none !important;
             }
 
@@ -471,7 +527,7 @@
                 display: block !important;
             }
 
-            /* --- 1. RECIBO DE PAGO & 4. CORTE DE CAJA Z (Mismo estilo base A4) --- */
+            /* --- RECIBO Y CORTE DE CAJA (A4) --- */
             #print-receipt,
             #print-cortez {
                 width: 200mm;
@@ -488,18 +544,6 @@
                 border-bottom: 3px solid #0284c7;
                 padding-bottom: 15px;
                 margin-bottom: 25px;
-            }
-
-            .rec-logo {
-                font-family: 'Syne', sans-serif;
-                font-size: 28px;
-                font-weight: 800;
-                color: #0284c7;
-                margin: 0;
-            }
-
-            .rec-logo span {
-                color: #0f172a;
             }
 
             .rec-company-info {
@@ -651,7 +695,7 @@
                 margin-right: auto;
             }
 
-            /* --- 2. FORMATO ETIQUETA ZEBRA (50mm x 25mm) --- */
+            /* --- FORMATO ETIQUETA ZEBRA (50mm x 25mm) --- */
             #print-label {
                 width: 50mm;
                 height: 25mm;
@@ -692,7 +736,7 @@
                 text-align: center;
             }
 
-            /* --- 3. FORMATO REPORTE RESULTADOS (Carta A4) --- */
+            /* --- REPORTE RESULTADOS MÉDICOS (A4) --- */
             #print-result {
                 width: 200mm;
                 margin: 0 auto;
@@ -738,19 +782,61 @@
 
 <body>
 
-    <!-- INTERFAZ WEB -->
-    <div id="app-interface" style="display: flex; flex-direction: column; height: 100%;">
+    <!-- ========================================== -->
+    <!-- MODAL GENÉRICA (Sustituye a los alerts)    -->
+    <!-- ========================================== -->
+    <div id="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modal-title" style="margin-bottom: 15px; color: var(--accent);">Mensaje</h3>
+            <p id="modal-text" style="color: var(--text-muted); margin-bottom: 20px; font-size:14px;"></p>
+            <div id="modal-input-container" style="display:none; margin-bottom: 20px;">
+                <input type="number" id="modal-input" placeholder="0.00" style="text-align:center;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="modal-btn-cancel" class="btn" style="display:none;"
+                    onclick="ModalSys.close()">Cancelar</button>
+                <button id="modal-btn-ok" class="btn btn-primary" onclick="ModalSys.close()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PANTALLA DE LOGIN                          -->
+    <!-- ========================================== -->
+    <div id="login-interface">
+        <div class="login-card">
+            <!-- IMAGEN DE LOGO LOGIN -->
+            <img src="https://raw.githubusercontent.com/unrecovery/lislab/a017da7058c4ab6490e0d7ccaf669f5e2fa9ba03/logo.png"
+                alt="Logo Laboratorio" class="print-logo-img" style="margin-bottom: 20px; max-height: 70px;">
+
+            <h2 style="margin-bottom: 5px; font-family: 'Syne', sans-serif;">Bienvenido</h2>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 25px;">Ingrese sus credenciales de
+                acceso</p>
+
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="loginUser" value="admin" placeholder="Ej. admin">
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label>Contraseña</label>
+                <input type="password" id="loginPass" value="1234" placeholder="••••••••">
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 15px;"
+                onclick="validarLogin()">Iniciar Sesión</button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- INTERFAZ PRINCIPAL DE LA APP WEB           -->
+    <!-- ========================================== -->
+    <div id="app-interface" style="display: none; flex-direction: column; height: 100%;">
 
         <nav class="navbar">
-            <div class="logo">
-                <svg class="icon" style="width:24px; height:24px;" viewBox="0 0 24 24">
-                    <path d="M10 2v7.31" />
-                    <path d="M14 9.3V1.99" />
-                    <path d="M8.5 2h7" />
-                    <path d="M14 9.3a6.5 6.5 0 1 1-4 0" />
-                    <path d="M5.52 16h12.96" />
-                </svg>
-                LIS<span>LAB</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <!-- IMAGEN DE LOGO BARRA DE NAVEGACIÓN -->
+                <img src="https://raw.githubusercontent.com/unrecovery/lislab/a017da7058c4ab6490e0d7ccaf669f5e2fa9ba03/logo.png"
+                    alt="Logo LISLAB" class="nav-logo-img">
             </div>
             <div class="nav-links">
                 <a class="nav-link active" onclick="switchTab('mod-recepcion', this)">
@@ -785,20 +871,17 @@
                 </a>
             </div>
             <div
-                style="font-weight: 700; font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
-                <svg class="icon" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span id="reloj-nav">00:00</span>
+                style="font-weight: 700; font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:15px;">
+                <span style="display:flex; align-items:center; gap:5px;"><svg class="icon" viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg> <span id="user-display">Usuario</span></span>
+                <button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="cerrarSesion()">Salir</button>
             </div>
         </nav>
 
-        <!-- ========================================== -->
-        <!-- MÓDULO 1: RECEPCIÓN                        -->
-        <!-- ========================================== -->
+        <!-- === MÓDULO 1: RECEPCIÓN === -->
         <div id="mod-recepcion" class="module active main-content">
-
             <div class="toolbar" style="margin: -20px -20px 20px -20px;">
                 <button class="btn" onclick="nuevoPacienteForm()">
                     <svg class="icon" viewBox="0 0 24 24">
@@ -902,14 +985,12 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- MÓDULO: HISTORIAL DE PACIENTES             -->
-        <!-- ========================================== -->
+        <!-- === MÓDULO: HISTORIAL DE PACIENTES === -->
         <div id="mod-historial" class="module main-content">
             <div class="card">
                 <h2 class="card-title" style="margin-bottom: 15px;">Historial de Pacientes y Cobros</h2>
                 <p style="color:var(--text-muted); margin-bottom: 20px;">Lista de pacientes procesados. Si hubo un
-                    error, puede cancelar el folio, lo cual registrará una devolución automática en la caja.</p>
+                    error, puede cancelar el folio para registrar la devolución en caja.</p>
 
                 <div class="table-responsive">
                     <table>
@@ -923,17 +1004,13 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="listaHistorial">
-                            <!-- Se llena desde localStorage -->
-                        </tbody>
+                        <tbody id="listaHistorial"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- MÓDULO 2: RESULTADOS                       -->
-        <!-- ========================================== -->
+        <!-- === MÓDULO 2: RESULTADOS === -->
         <div id="mod-resultados" class="module main-content">
 
             <!-- VISTA 1: TABLA DE PACIENTES -->
@@ -951,9 +1028,7 @@
                                     <th>Acción</th>
                                 </tr>
                             </thead>
-                            <tbody id="listaResultadosGlobal">
-                                <!-- Se llena desde localStorage -->
-                            </tbody>
+                            <tbody id="listaResultadosGlobal"></tbody>
                         </table>
                     </div>
                 </div>
@@ -993,9 +1068,7 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- MÓDULO 4: CAJA Y CORTES                    -->
-        <!-- ========================================== -->
+        <!-- === MÓDULO 4: CAJA Y CORTES === -->
         <div id="mod-caja" class="module main-content">
             <div class="toolbar" style="margin: -20px -20px 20px -20px;">
                 <button class="btn" onclick="simularRetiro()">
@@ -1040,9 +1113,7 @@
                                 <th class="text-right">Monto</th>
                             </tr>
                         </thead>
-                        <tbody id="listaMovimientos">
-                            <!-- Se llena dinámicamente -->
-                        </tbody>
+                        <tbody id="listaMovimientos"></tbody>
                     </table>
                 </div>
             </div>
@@ -1058,12 +1129,14 @@
     <div id="print-receipt" class="print-container">
         <div class="rec-header">
             <div>
-                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <!-- IMAGEN DE LOGO PARA IMPRESIÓN (RECIBO) -->
+                <img src="https://raw.githubusercontent.com/unrecovery/lislab/a017da7058c4ab6490e0d7ccaf669f5e2fa9ba03/logo.png"
+                    alt="Logo LISLAB" class="print-logo-img">
                 <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Laboratorio de Análisis Clínicos
                     Especializados</div>
             </div>
             <div class="rec-company-info">
-                <strong>LISLAB S.A. DE C.V.</strong><br>
+                <strong>LABORATORIO S.A. DE C.V.</strong><br>
                 Av. Principal 123, Colonia Centro.<br>
                 RFC: LISL260323XYZ<br>
                 Tel: (555) 123-4567 | www.lislab.mx
@@ -1098,9 +1171,7 @@
                     <th style="width: 20%; text-align: right;">IMPORTE</th>
                 </tr>
             </thead>
-            <tbody id="prc-lista">
-                <!-- llenado dinámico -->
-            </tbody>
+            <tbody id="prc-lista"></tbody>
         </table>
 
         <div class="rec-totals">
@@ -1111,7 +1182,7 @@
 
         <div class="rec-footer">
             Los resultados estarán disponibles según los tiempos de proceso de cada estudio.<br>
-            Consulte sus resultados en línea ingresando a www.lislab.mx con su Folio.<br>
+            Consulte sus resultados en línea ingresando a nuestro sitio web con su Folio.<br>
             *** ESTE DOCUMENTO ES UN COMPROBANTE DE PAGO, NO ES UN RESULTADO MÉDICO ***
         </div>
     </div>
@@ -1128,7 +1199,9 @@
     <div id="print-result" class="print-container">
         <div class="rec-header">
             <div>
-                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <!-- IMAGEN DE LOGO PARA IMPRESIÓN (RESULTADOS) -->
+                <img src="https://raw.githubusercontent.com/unrecovery/lislab/a017da7058c4ab6490e0d7ccaf669f5e2fa9ba03/logo.png"
+                    alt="Logo LISLAB" class="print-logo-img">
                 <p style="font-size:12px; margin-top:5px; color:#555;">Laboratorio de Análisis Clínicos Especializados
                 </p>
             </div>
@@ -1166,9 +1239,7 @@
                     <th>VALORES DE REFERENCIA</th>
                 </tr>
             </thead>
-            <tbody id="pr-resultados-tabla">
-                <!-- Llenado dinámico -->
-            </tbody>
+            <tbody id="pr-resultados-tabla"></tbody>
         </table>
         <div style="font-size:10px; color:#555;">(*) Valores fuera de rango de referencia.</div>
 
@@ -1182,17 +1253,19 @@
         </div>
     </div>
 
-    <!-- 4. CORTE Z (REDISEÑADO A TAMAÑO CARTA DETALLADO) -->
+    <!-- 4. CORTE Z (A4 DETALLADO) -->
     <div id="print-cortez" class="print-container">
         <div class="rec-header">
             <div>
-                <h1 class="rec-logo">LIS<span>LAB</span></h1>
+                <!-- IMAGEN DE LOGO PARA IMPRESIÓN (CORTE) -->
+                <img src="https://raw.githubusercontent.com/unrecovery/lislab/a017da7058c4ab6490e0d7ccaf669f5e2fa9ba03/logo.png"
+                    alt="Logo LISLAB" class="print-logo-img">
                 <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Sistema de Administración de Caja</div>
             </div>
             <div class="rec-company-info">
                 <strong>REPORTE DE TURNO</strong><br>
                 Impreso: <span class="current-date"></span> <span id="pz-hora-impresion"></span><br>
-                Cajero: Recepción General
+                Cajero: <span id="pz-usuario-nombre">General</span>
             </div>
         </div>
 
@@ -1226,9 +1299,7 @@
                     <th style="width: 20%; text-align: right;">MONTO</th>
                 </tr>
             </thead>
-            <tbody id="pz-lista-completa">
-                <!-- llenado dinámico de todos los movimientos -->
-            </tbody>
+            <tbody id="pz-lista-completa"></tbody>
         </table>
 
         <div class="rec-totals" style="width: 45%; margin-top: 30px;">
@@ -1251,7 +1322,49 @@
 
     <script>
         // ==========================================
-        // ALMACENAMIENTO LOCAL (Base de Datos Simulada)
+        // SISTEMA DE MODALES (Reemplazo de Alerts)
+        // ==========================================
+        const ModalSys = {
+            activeCallback: null,
+            show: function (title, text, type = 'info', callback = null) {
+                document.getElementById('modal-title').innerText = title;
+                document.getElementById('modal-text').innerText = text;
+
+                const inputContainer = document.getElementById('modal-input-container');
+                const inputField = document.getElementById('modal-input');
+                const btnCancel = document.getElementById('modal-btn-cancel');
+                const btnOk = document.getElementById('modal-btn-ok');
+
+                inputContainer.style.display = 'none';
+                btnCancel.style.display = 'none';
+                inputField.value = '';
+
+                this.activeCallback = callback;
+
+                if (type === 'confirm') {
+                    btnCancel.style.display = 'inline-block';
+                    btnOk.onclick = () => { this.close(); if (this.activeCallback) this.activeCallback(true); };
+                    btnCancel.onclick = () => { this.close(); if (this.activeCallback) this.activeCallback(false); };
+                } else if (type === 'prompt') {
+                    inputContainer.style.display = 'block';
+                    btnCancel.style.display = 'inline-block';
+                    inputField.focus();
+                    btnOk.onclick = () => { this.close(); if (this.activeCallback) this.activeCallback(inputField.value); };
+                    btnCancel.onclick = () => { this.close(); if (this.activeCallback) this.activeCallback(null); };
+                } else {
+                    // Info error simple
+                    btnOk.onclick = () => { this.close(); if (this.activeCallback) this.activeCallback(true); };
+                }
+
+                document.getElementById('modal-overlay').style.display = 'flex';
+            },
+            close: function () {
+                document.getElementById('modal-overlay').style.display = 'none';
+            }
+        };
+
+        // ==========================================
+        // ALMACENAMIENTO LOCAL Y LOGIN
         // ==========================================
         let DB = {
             pacientes: [],
@@ -1260,29 +1373,73 @@
             folioActual: 10026
         };
 
-        // Variables temporales en memoria para la recepción
+        let currentUser = "";
         let estudiosActuales = [];
         let idCapturaActiva = null;
 
         window.onload = () => {
+            // Comprobar estado de sesión
+            const savedSession = sessionStorage.getItem('lislab_session');
+            if (savedSession) {
+                currentUser = savedSession;
+                iniciarApp();
+            } else {
+                document.getElementById('login-interface').style.display = 'flex';
+            }
+
+            document.querySelectorAll('.current-date').forEach(el => el.innerText = new Date().toLocaleDateString('es-MX'));
+        };
+
+        function validarLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+
+            if (user === "" || pass === "") {
+                ModalSys.show("Error de Acceso", "Por favor ingrese usuario y contraseña.", "info");
+                return;
+            }
+
+            // Simulación de Login (Acepta cualquier cosa que no esté vacía)
+            currentUser = user;
+            sessionStorage.setItem('lislab_session', user);
+
+            document.getElementById('login-interface').style.animation = 'fadeIn 0.3s ease reverse forwards';
+            setTimeout(() => {
+                document.getElementById('login-interface').style.display = 'none';
+                iniciarApp();
+            }, 300);
+        }
+
+        function cerrarSesion() {
+            ModalSys.show("Cerrar Sesión", "¿Está seguro de que desea salir del sistema?", "confirm", (res) => {
+                if (res) {
+                    sessionStorage.removeItem('lislab_session');
+                    location.reload();
+                }
+            });
+        }
+
+        function iniciarApp() {
+            document.getElementById('app-interface').style.display = 'flex';
+            document.getElementById('user-display').innerText = currentUser.toUpperCase();
+            document.getElementById('pz-usuario-nombre').innerText = currentUser.toUpperCase();
+
             cargarBD();
             document.getElementById('folio').value = DB.folioActual;
-            document.querySelectorAll('.current-date').forEach(el => el.innerText = new Date().toLocaleDateString('es-MX'));
 
-            // Renderizar vistas con datos de BD
             renderizarHistorial();
             renderizarListaResultados();
             actualizarCajaVisual();
             renderizarMovimientos();
-        };
+        }
 
         function cargarBD() {
-            const data = localStorage.getItem('lislab_db_v2'); // Cambié la key para iniciar limpio con la nueva estructura
+            const data = localStorage.getItem('lislab_db_v3');
             if (data) { DB = JSON.parse(data); }
         }
 
         function guardarBD() {
-            localStorage.setItem('lislab_db_v2', JSON.stringify(DB));
+            localStorage.setItem('lislab_db_v3', JSON.stringify(DB));
         }
 
         // ==========================================
@@ -1295,7 +1452,10 @@
             tabElement.classList.add('active');
         }
 
-        setInterval(() => { document.getElementById('reloj-nav').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }); }, 1000);
+        setInterval(() => {
+            const el = document.getElementById('reloj-nav');
+            if (el) el.innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
 
         // ==========================================
         // MÓDULO 1: RECEPCIÓN Y DESCUENTOS
@@ -1370,21 +1530,19 @@
         }
 
         function guardarYCobrar() {
-            if (estudiosActuales.length === 0) { alert("Agregue al menos un estudio."); return; }
+            if (estudiosActuales.length === 0) { ModalSys.show("Aviso", "Agregue al menos un estudio.", "info"); return; }
 
             const nombre = document.getElementById('nombre').value;
             const apPaterno = document.getElementById('apPaterno').value;
             const nombreCompleto = `${nombre} ${apPaterno} ${document.getElementById('apMaterno').value}`.trim() || 'Público en General';
 
-            if (!nombre || !apPaterno) { alert("Ingrese al menos Nombre y Apellido Paterno."); return; }
+            if (!nombre || !apPaterno) { ModalSys.show("Aviso", "Ingrese al menos Nombre y Apellido Paterno.", "info"); return; }
 
             const subtotal = estudiosActuales.reduce((acc, curr) => acc + curr.precio, 0);
             const descuento = parseFloat(document.getElementById('inputDescuento').value) || 0;
             const totalCobro = Math.max(0, subtotal - descuento);
-
             const fechaActualStr = new Date().toLocaleDateString('es-MX') + " " + new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 
-            // 1. Crear Objeto Paciente
             const nuevoPaciente = {
                 folio: DB.folioActual,
                 fecha: fechaActualStr,
@@ -1400,9 +1558,7 @@
                 resultadosGuardados: null
             };
 
-            DB.pacientes.unshift(nuevoPaciente); // Agregar al inicio
-
-            // 2. Registrar en Caja
+            DB.pacientes.unshift(nuevoPaciente);
             DB.caja.ingresos += totalCobro;
             DB.movimientos.unshift({
                 hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
@@ -1412,25 +1568,22 @@
                 tipo: 'ingreso'
             });
 
-            // 3. Aumentar folio y guardar BD
             DB.folioActual++;
             guardarBD();
 
-            // Actualizar Vistas
             document.getElementById('folio').value = DB.folioActual;
             renderizarHistorial();
             renderizarListaResultados();
             actualizarCajaVisual();
             renderizarMovimientos();
 
-            // Imprimir recibo automáticamente
             ejecutarImpresionRecibo(nuevoPaciente);
             nuevoPacienteForm();
         }
 
         function imprimirReciboActual() {
             if (estudiosActuales.length === 0) {
-                alert("No hay estudios cargados para imprimir. Guárdalo primero o imprímelo desde el Historial.");
+                ModalSys.show("Aviso", "No hay estudios cargados para imprimir. Guárdalo primero o imprímelo desde el Historial.", "info");
                 return;
             }
             const subtotal = estudiosActuales.reduce((acc, curr) => acc + curr.precio, 0);
@@ -1466,9 +1619,7 @@
             DB.pacientes.forEach((px) => {
                 const isCanceled = px.estado === 'Cancelado';
                 const statusBadge = isCanceled ? '<span class="badge badge-canceled">Cancelado</span>' : '<span class="badge badge-ready">Activo</span>';
-
-                // Si está cancelado, ocultar botones de acción y tachar monto
-                const montoDisplay = isCanceled ? `<span style="text-decoration:line-through; color:var(--muted);">$${px.total.toFixed(2)}</span>` : `$${px.total.toFixed(2)}`;
+                const montoDisplay = isCanceled ? `<span style="text-decoration:line-through; color:var(--text-muted);">$${px.total.toFixed(2)}</span>` : `$${px.total.toFixed(2)}`;
 
                 let botones = '';
                 if (!isCanceled) {
@@ -1496,35 +1647,28 @@
             const px = obtenerPaciente(folio);
             if (!px) return;
 
-            if (confirm(`¿Está seguro de CANCELAR el Folio ${folio} a nombre de ${px.nombre}?\n\nEsto registrará una devolución por $${px.total.toFixed(2)} en la caja y eliminará sus pendientes.`)) {
-                // 1. Cambiar estado
-                px.estado = 'Cancelado';
-
-                // 2. Registrar devolución (Egreso) en Caja
-                DB.caja.retiros += px.total;
-                DB.movimientos.unshift({
-                    hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-                    concepto: 'Devolución (Cancelación)',
-                    ref: `DEV-${px.folio}`,
-                    monto: px.total,
-                    tipo: 'retiro'
-                });
-
-                guardarBD();
-
-                // 3. Actualizar vistas
-                renderizarHistorial();
-                renderizarListaResultados();
-                actualizarCajaVisual();
-                renderizarMovimientos();
-
-                alert(`Folio ${folio} cancelado exitosamente.`);
-            }
+            ModalSys.show("Cancelar Folio", `¿Está seguro de CANCELAR el Folio ${folio} a nombre de ${px.nombre}?\n\nEsto registrará una devolución por $${px.total.toFixed(2)} en la caja.`, "confirm", (res) => {
+                if (res) {
+                    px.estado = 'Cancelado';
+                    DB.caja.retiros += px.total;
+                    DB.movimientos.unshift({
+                        hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                        concepto: 'Devolución (Cancelación)',
+                        ref: `DEV-${px.folio}`,
+                        monto: px.total,
+                        tipo: 'retiro'
+                    });
+                    guardarBD();
+                    renderizarHistorial();
+                    renderizarListaResultados();
+                    actualizarCajaVisual();
+                    renderizarMovimientos();
+                    ModalSys.show("Éxito", `Folio ${folio} cancelado exitosamente.`, "info");
+                }
+            });
         }
 
-        function obtenerPaciente(folio) {
-            return DB.pacientes.find(p => p.folio === folio);
-        }
+        function obtenerPaciente(folio) { return DB.pacientes.find(p => p.folio === folio); }
 
         // ==========================================
         // MÓDULO 2: RESULTADOS
@@ -1532,8 +1676,6 @@
         function renderizarListaResultados() {
             const tbody = document.getElementById('listaResultadosGlobal');
             tbody.innerHTML = '';
-
-            // Filtrar pacientes cancelados de la lista de resultados
             const pxActivos = DB.pacientes.filter(p => p.estado !== 'Cancelado');
 
             if (pxActivos.length === 0) {
@@ -1572,7 +1714,6 @@
             const px = obtenerPaciente(folio);
             if (!px) return;
             idCapturaActiva = folio;
-
             document.getElementById('cap-paciente-nombre').innerText = px.nombre;
             document.getElementById('res-glu').value = '';
             document.getElementById('res-ure').value = '';
@@ -1592,7 +1733,6 @@
         function guardarYLiberarResultado() {
             if (!idCapturaActiva) return;
             const px = obtenerPaciente(idCapturaActiva);
-
             px.estado = 'Liberado';
             px.resultadosGuardados = {
                 glucosa: document.getElementById('res-glu').value,
@@ -1601,13 +1741,12 @@
                 urico: document.getElementById('res-uri').value
             };
             guardarBD();
-
             cerrarCaptura();
             renderizarListaResultados();
         }
 
         function enviarWA(nombrePx) {
-            const mensaje = encodeURIComponent(`Hola ${nombrePx}, sus resultados de LISLAB ya están disponibles. Puede solicitarlos por este medio o recogerlos en sucursal.`);
+            const mensaje = encodeURIComponent(`Hola ${nombrePx}, sus resultados de LISLAB ya están disponibles.`);
             window.open(`https://wa.me/?text=${mensaje}`, '_blank');
         }
 
@@ -1616,23 +1755,24 @@
         // MÓDULO 4: CAJA Y CORTES
         // ==========================================
         function simularRetiro() {
-            const montoStr = prompt("Ingrese el monto del Retiro / Gasto (Ej. Compra de jeringas):");
-            if (!montoStr) return;
-            const monto = parseFloat(montoStr);
-            if (isNaN(monto) || monto <= 0) return;
+            ModalSys.show("Retiro de Efectivo", "Ingrese la cantidad del retiro o gasto:", "prompt", (montoStr) => {
+                if (!montoStr) return;
+                const monto = parseFloat(montoStr);
+                if (isNaN(monto) || monto <= 0) return;
 
-            DB.caja.retiros += monto;
-            DB.movimientos.unshift({
-                hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
-                concepto: 'Gasto Administrativo',
-                ref: `G-${Math.floor(Math.random() * 1000)}`,
-                monto: monto,
-                tipo: 'retiro'
+                DB.caja.retiros += monto;
+                DB.movimientos.unshift({
+                    hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+                    concepto: 'Gasto Administrativo',
+                    ref: `G-${Math.floor(Math.random() * 1000)}`,
+                    monto: monto,
+                    tipo: 'retiro'
+                });
+
+                guardarBD();
+                actualizarCajaVisual();
+                renderizarMovimientos();
             });
-
-            guardarBD();
-            actualizarCajaVisual();
-            renderizarMovimientos();
         }
 
         function actualizarCajaVisual() {
@@ -1646,7 +1786,7 @@
             const tbody = document.getElementById('listaMovimientos');
             tbody.innerHTML = '';
             if (DB.movimientos.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin movimientos registrados en este turno.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Sin movimientos.</td></tr>';
                 return;
             }
 
@@ -1665,50 +1805,52 @@
         }
 
         function cerrarCaja() {
-            if (DB.caja.ingresos === 0 && DB.caja.retiros === 0) { alert("La caja ya está en ceros."); return; }
-
-            if (confirm("¿Está seguro de generar el Reporte de Corte Z?\n\nEsto emitirá el reporte A4 en PDF y reseteará el turno actual a $0.00.")) {
-
-                // Preparar impresión de Corte
-                document.getElementById('pz-hora-impresion').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                document.getElementById('pz-cant-mov').innerText = DB.movimientos.length;
-
-                const tbodyPZ = document.getElementById('pz-lista-completa');
-                tbodyPZ.innerHTML = '';
-
-                // Llenar tabla del corte Z (del último al primero para orden cronológico si se desea, aquí lo dejamos como está)
-                [...DB.movimientos].reverse().forEach(m => {
-                    const color = m.tipo === 'ingreso' ? '#0f172a' : '#dc2626';
-                    const signo = m.tipo === 'ingreso' ? '' : '-';
-                    tbodyPZ.innerHTML += `
-        <tr>
-          <td>${m.hora}</td>
-          <td>${m.concepto}</td>
-          <td>${m.ref}</td>
-          <td style="text-align: right; color:${color};">${signo}$${m.monto.toFixed(2)}</td>
-        </tr>
-      `;
-                });
-
-                document.getElementById('pz-ingresos').innerText = `$${DB.caja.ingresos.toFixed(2)}`;
-                document.getElementById('pz-retiros').innerText = `$${DB.caja.retiros.toFixed(2)}`;
-                document.getElementById('pz-total').innerText = `$${DB.caja.total.toFixed(2)}`;
-
-                document.body.className = 'print-cortez';
-                window.print();
-
-                // Limpiar Caja en BD
-                DB.caja = { ingresos: 0, retiros: 0, total: 0 };
-                DB.movimientos = [];
-                guardarBD();
-
-                actualizarCajaVisual();
-                renderizarMovimientos();
+            if (DB.caja.ingresos === 0 && DB.caja.retiros === 0) {
+                ModalSys.show("Aviso", "La caja ya está en ceros.", "info");
+                return;
             }
+
+            ModalSys.show("Corte Z", "¿Está seguro de generar el Reporte de Corte Z?\nEsto emitirá el reporte PDF y reseteará el turno actual.", "confirm", (res) => {
+                if (res) {
+                    document.getElementById('pz-hora-impresion').innerText = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('pz-cant-mov').innerText = DB.movimientos.length;
+
+                    const tbodyPZ = document.getElementById('pz-lista-completa');
+                    tbodyPZ.innerHTML = '';
+
+                    [...DB.movimientos].reverse().forEach(m => {
+                        const color = m.tipo === 'ingreso' ? '#0f172a' : '#dc2626';
+                        const signo = m.tipo === 'ingreso' ? '' : '-';
+                        tbodyPZ.innerHTML += `
+          <tr>
+            <td>${m.hora}</td>
+            <td>${m.concepto}</td>
+            <td>${m.ref}</td>
+            <td style="text-align: right; color:${color};">${signo}$${m.monto.toFixed(2)}</td>
+          </tr>
+        `;
+                    });
+
+                    document.getElementById('pz-ingresos').innerText = `$${DB.caja.ingresos.toFixed(2)}`;
+                    document.getElementById('pz-retiros').innerText = `$${DB.caja.retiros.toFixed(2)}`;
+                    document.getElementById('pz-total').innerText = `$${DB.caja.total.toFixed(2)}`;
+
+                    document.body.className = 'print-cortez';
+                    window.print();
+
+                    // Limpiar Caja
+                    DB.caja = { ingresos: 0, retiros: 0, total: 0 };
+                    DB.movimientos = [];
+                    guardarBD();
+
+                    actualizarCajaVisual();
+                    renderizarMovimientos();
+                }
+            });
         }
 
         // ==========================================
-        // FUNCIONES DE IMPRESIÓN DINÁMICA
+        // IMPRESIÓN DINÁMICA
         // ==========================================
         function imprimirReciboDesdeHistorial(folio) {
             const px = obtenerPaciente(folio);
@@ -1731,7 +1873,6 @@
                 tbody.innerHTML += `<tr><td>${est.clave}</td><td>${est.nombre}</td><td style="text-align: right;">$${est.precio.toFixed(2)}</td></tr>`;
             });
 
-            // Soporte para facturas sin descuento registrado en versiones anteriores
             const sub = px.subtotal || px.total;
             const desc = px.descuento || 0;
 
